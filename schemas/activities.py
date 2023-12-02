@@ -71,11 +71,11 @@ class ActivityCreate(ActivityBase):
 
 
 class ActivityUpdate(ActivityBase):
-    name: Union[str, None]  = None
+    name: Union[str, None] = None
     type: Union[ActivityType, None] = None
-    description: Union[str, None]  = Field(
+    description: Union[str, None] = Field(
         default=None, title="The description of the activity", max_length=300
     )
-    date: date | None = date
-    distance: Union[float, None]  = None
-    time: int | None = None
+    date: Union[date, None] = date
+    distance: Union[float, None] = None
+    time:Union[int, None] = None
