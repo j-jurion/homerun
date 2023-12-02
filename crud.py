@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -161,7 +161,7 @@ def create_monthly(db: Session, month: str, user_id: int, activity_type: str):
     return db_monthly
 
 
-def get_year_id(db: Session, date: date, user_id: int, activity_type: str, create_if_none=True) -> int | None:
+def get_year_id(db: Session, date: date, user_id: int, activity_type: str, create_if_none=True) -> Union[int, None]:
     year = str(date.year)
     db_yearly = db.query(models.Yearly).filter(models.Yearly.year == year,
                                                models.Yearly.activity_type == activity_type).first()
