@@ -72,7 +72,7 @@ class ActivityCreate(ActivityBase):
 
 class ActivityUpdate(ActivityBase):
     name: Union[str, None]  = None
-    type: ActivityType | None = None
+    type: Union[ActivityType, None] = None
     description: Union[str, None]  = Field(
         default=None, title="The description of the activity", max_length=300
     )
