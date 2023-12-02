@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import date
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, Field
 
@@ -31,13 +31,13 @@ class DistanceTag(str, Enum):
 class ActivityBase(BaseModel):
     name: str
     type: ActivityType
-    description: str | None = Field(
+    description: Union[str, None] = Field(
         default=None, title="The description of the activity", max_length=300
     )
     date: date
     distance: float
     time: int
-    tags: str | None = None
+    tags: Union[str, None] = None
 
     model_config = {
         "json_schema_extra": {
@@ -63,7 +63,7 @@ class Activity(ActivityBase):
     year_id: int
     pace: int
     speed: float
-    distance_tag: DistanceTag | None = None
+    distance_tag: Union[DistanceTag, None] = None
 
 
 class ActivityCreate(ActivityBase):
@@ -71,11 +71,11 @@ class ActivityCreate(ActivityBase):
 
 
 class ActivityUpdate(ActivityBase):
-    name: str | None = None
+    name: Union[str, None]  = None
     type: ActivityType | None = None
-    description: str | None = Field(
+    description: Union[str, None]  = Field(
         default=None, title="The description of the activity", max_length=300
     )
     date: date | None = date
-    distance: float | None = None
+    distance: Union[float, None]  = None
     time: int | None = None

@@ -1,3 +1,5 @@
+from typing import Union
+
 from pydantic import BaseModel
 
 from schemas.activities import Activity
@@ -28,5 +30,5 @@ class User(UserBase):
 
 
 class UserUpdate(UserBase):
-    user_name: str | None = None
-    password: str | None = None
+    user_name: Union[str, None] = None
+    password: Union[str, None] = None
