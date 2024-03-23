@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 import crud
-from schemas.activities import Activity, ActivityUpdate, ActivityCreate
+from schemas.activities import Activity, ActivityCreate
 from database import get_db
 
 router = APIRouter(
@@ -26,8 +26,8 @@ def create_activity(
     return crud.create_activity(db=db, activity=activity, user_id=user_id)
 
 
-@router.patch("/{activity_id}")
-def edit_activity(activity_id: int, activity: ActivityUpdate,
+@router.put("/{activity_id}")
+def edit_activity(activity_id: int, activity: ActivityCreate,
                   db: Session = Depends(get_db)) -> Activity:
     return crud.edit_activity(db=db, activity_id=activity_id, activity=activity)
 

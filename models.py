@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Double, ForeignKey
 from sqlalchemy.orm import relationship
 
 from database import Base
+from utils.utils import get_official_and_personal_indices
 
 
 class Activity(Base):
@@ -12,12 +13,9 @@ class Activity(Base):
     type = Column(String, index=True, nullable=False)
     description = Column(String, index=True)
     date = Column(String, index=True, nullable=False)
-    distance = Column(Double, index=True, nullable=False)
-    distance_tag = Column(String)
-    time = Column(Integer, index=True, nullable=False)
-    pace = Column(Integer, index=True, nullable=False)
-    speed = Column(Double, index=True, nullable=False)
     tags = Column(String)
+    results = relationship("Result", back_populates="activity", cascade="all, delete-orphan")
+    distance_tag = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     month_id = Column(Integer, ForeignKey("monthly.id"), nullable=False)
     year_id = Column(Integer, ForeignKey("yearly.id"), nullable=False)
@@ -54,15 +52,30 @@ class Monthly(Base):
     def total_distance(self) -> int:
         total_distance = 0
         for activity in self.activities:
-            total_distance += activity.distance
+            official_index, personal_index = get_official_and_personal_indices(activity)
+            if personal_index:
+                total_distance += activity.results[personal_index].distance
+            elif official_index:
+                total_distance += activity.results[official_index].distance
+            else:
+                total_distance += activity.results[0].distance
         return total_distance
+
 
     @property
     def total_time(self) -> int:
         total_time = 0
         for activity in self.activities:
-            total_time += activity.time
+            official_index, personal_index = get_official_and_personal_indices(activity)
+            if personal_index:
+                total_time += activity.results[personal_index].time
+            elif official_index:
+                total_time += activity.results[official_index].time
+            else:
+                total_time += activity.results[0].time
         return total_time
+
+
 
 
 class Yearly(Base):
@@ -80,14 +93,39 @@ class Yearly(Base):
     def total_distance(self) -> int:
         total_distance = 0
         for activity in self.activities:
-            total_distance += activity.distance
+            official_index, personal_index = get_official_and_personal_indices(activity)
+            if personal_index:
+                total_distance += activity.results[personal_index].distance
+            elif official_index:
+                total_distance += activity.results[official_index].distance
+            else:
+                total_distance += activity.results[0].distance
         return total_distance
 
     @property
     def total_time(self) -> int:
         total_time = 0
         for activity in self.activities:
-            total_time += activity.time
+            official_index, personal_index = get_official_and_personal_indices(activity)
+            if personal_index:
+                total_time += activity.results[personal_index].time
+            elif official_index:
+                total_time += activity.results[official_index].time
+            else:
+                total_time += activity.results[0].time
         return total_time
 
 
+class Result(Base):
+    __tablename__ = "results"
+
+    id = Column(Integer, primary_key=True, index=True)
+    activity_id = Column(Integer, ForeignKey("activities.id"), nullable=False)
+    distance = Column(Double, index=True, nullable=False)
+    distance_tag = Column(String)
+    time = Column(Integer, index=True, nullable=False)
+    pace = Column(Integer, index=True, nullable=False)
+    speed = Column(Double, index=True, nullable=False)
+    tracking_type = Column(String)
+
+    activity = relationship("Activity", back_populates="results")
