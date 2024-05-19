@@ -5,10 +5,11 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 import models
-from schemas.activities import ActivityCreate, ActivityType
-from schemas.results import DistanceTagSwimming, DistanceTagRunning, ResultBase
+from definitions import ActivityType, DistanceTagRunning, DistanceTagSwimming
+from schemas.activities import ActivityCreate
+from schemas.results import ResultBase
 from schemas.users import UserCreate, UserUpdate
-from utils.utils import calculate_pace, calculate_speed, get_distance_tag, get_activity_distance_tag, sort_on_pace
+from utils.utils import calculate_pace, calculate_speed, get_distance_tag, sort_on_pace, get_activity_distance_tag
 
 
 def get_user(db: Session, user_id: int):
@@ -81,11 +82,14 @@ def create_activity(db: Session, activity: ActivityCreate, user_id: int):
         type=activity.type,
         description=activity.description,
         date=activity.date,
-        tags=activity.tags,
+        environment=activity.environment,
+        training_type=activity.training_type,
+        race_type=activity.race_type,
+        with_friends=activity.with_friends,
+        distance_tag=get_activity_distance_tag(activity.results, activity.type),
         user_id=user_id,
         month_id=get_month_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
         year_id=get_year_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
-        distance_tag=get_activity_distance_tag(activity.results, activity.type),
     )
     db.add(db_activity)
     db.commit()

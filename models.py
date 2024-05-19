@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Double, ForeignKey
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -13,9 +13,14 @@ class Activity(Base):
     type = Column(String, index=True, nullable=False)
     description = Column(String, index=True)
     date = Column(String, index=True, nullable=False)
-    tags = Column(String)
     results = relationship("Result", back_populates="activity", cascade="all, delete-orphan")
-    distance_tag = Column(String)
+    distance_tag = Column(String, index=True, nullable=False)
+
+    environment = Column(String, index=True)
+    training_type = Column(String, index=True)
+    race_type = Column(String, index=True)
+    with_friends = Column(Boolean, index=True)
+
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     month_id = Column(Integer, ForeignKey("monthly.id"), nullable=False)
     year_id = Column(Integer, ForeignKey("yearly.id"), nullable=False)
@@ -126,6 +131,7 @@ class Result(Base):
     time = Column(Integer, index=True, nullable=False)
     pace = Column(Integer, index=True, nullable=False)
     speed = Column(Double, index=True, nullable=False)
+    url = Column(String, index=True)
     tracking_type = Column(String)
 
     activity = relationship("Activity", back_populates="results")
