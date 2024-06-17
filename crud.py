@@ -60,6 +60,10 @@ def get_activities(db: Session, type: str, user_id: int):
         models.Activity.type == type).all()
 
 
+def get_activity(db: Session, activity_id: int):
+    return db.query(models.Activity).filter(models.Activity.id == activity_id).first()
+
+
 def create_result(db: Session, result: ResultBase, activity_id: int,
                   activity_type: ActivityType):
     db_results = models.Result(
