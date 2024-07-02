@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 import models
 from definitions import ActivityType, DistanceTagRunning, DistanceTagSwimming
 from schemas.activities import ActivityCreate
-from schemas.results import ResultBase
+from schemas.events import EventBase
+from schemas.results import ResultBase, Goal, GoalBase
 from schemas.users import UserCreate, UserUpdate
 from utils.utils import calculate_pace, calculate_speed, get_distance_tag, sort_on_pace, get_activity_distance_tag
 
@@ -94,6 +95,7 @@ def create_activity(db: Session, activity: ActivityCreate, user_id: int):
         user_id=user_id,
         month_id=get_month_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
         year_id=get_year_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
+        event_id=activity.event_id,
     )
     db.add(db_activity)
     db.commit()
@@ -193,3 +195,48 @@ def get_best_efforts(db: Session, user_id: int, activity_type: str):
             best_efforts[key] = best_efforts_by_distance[:3]
 
     return best_efforts
+
+
+def get_events(db: Session, type: str, user_id: int):
+    return db.query(models.Event).filter(models.Event.user_id == user_id).filter(
+        models.Event.type == type).all()
+
+
+def get_event(db: Session, event_id: int):
+    return db.query(models.Event).filter(models.Event.id == event_id).first()
+
+
+def create_goal(db: Session, goal: GoalBase, event_id: int):
+    db_results = models.Goal(
+        **goal.model_dump(),
+        event_id=event_id,
+        pace=calculate_pace(goal.time, goal.distance),
+        speed=calculate_speed(goal.time, goal.distance),
+    )
+    db.add(db_results)
+    db.commit()
+    db.refresh(db_results)
+
+    return db_results
+
+
+def create_event(db: Session, event: EventBase, user_id: int):
+    print(event)
+    db_event = models.Event(
+        name=event.name,
+        type=event.type,
+        description=event.description,
+        date=event.date,
+        environment=event.environment,
+        race_type=event.race_type,
+        distance_tag=get_distance_tag(event.goal.distance, event.type),
+        user_id=user_id,
+        goal=event.goal
+    )
+    db.add(db_event)
+    db.commit()
+    db.refresh(db_event)
+
+    if event.goal:
+        create_goal(db, event.goal, db_event.id)
+    return db_event

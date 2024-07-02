@@ -6,10 +6,20 @@ from pydantic import BaseModel
 from definitions import TrackingType, DistanceTagRunning, DistanceTagSwimming
 
 
+class GoalBase(BaseModel):
+    distance: float | None = None
+    time: int | None = None
+
+
+class Goal(GoalBase):
+    pace: int | None = None
+    speed: float | None = None
+
+
 class ResultBase(BaseModel):
-    tracking_type: TrackingType
     distance: float
     time: int
+    tracking_type: TrackingType
     url: str | None = None
 
 

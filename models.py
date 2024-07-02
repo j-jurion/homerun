@@ -38,6 +38,7 @@ class User(Base):
     hashed_password = Column(String)
 
     activities = relationship("Activity", back_populates="user", cascade="all, delete-orphan")
+    events = relationship("Event", back_populates="user", cascade="all, delete-orphan")
     monthly = relationship("Monthly", back_populates="user", cascade="all, delete-orphan")
     yearly = relationship("Yearly", back_populates="user", cascade="all, delete-orphan")
 
@@ -66,7 +67,6 @@ class Monthly(Base):
                 total_distance += activity.results[0].distance
         return total_distance
 
-
     @property
     def total_time(self) -> int:
         total_time = 0
@@ -79,8 +79,6 @@ class Monthly(Base):
             else:
                 total_time += activity.results[0].time
         return total_time
-
-
 
 
 class Yearly(Base):
@@ -135,3 +133,34 @@ class Result(Base):
     tracking_type = Column(String)
 
     activity = relationship("Activity", back_populates="results")
+
+
+class Goal(Base):
+    __tablename__ = "goals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    distance = Column(Double, index=True)
+    time = Column(Integer, index=True)
+    pace = Column(Integer, index=True)
+    speed = Column(Double, index=True)
+
+    event = relationship("Event", back_populates="goal")
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    type = Column(String, index=True, nullable=False)
+    description = Column(String, index=True)
+    date = Column(String, index=True, nullable=False)
+    environment = Column(String, index=True)
+    race_type = Column(String, index=True)
+    distance_tag = Column(String, index=True, nullable=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    goal = relationship("Goal", back_populates="event", cascade="all, delete-orphan")
+    user = relationship("User", back_populates="events")

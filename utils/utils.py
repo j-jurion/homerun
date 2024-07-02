@@ -1,5 +1,5 @@
 from schemas.activities import ActivityType, Activity
-from schemas.results import DistanceTagRunning, DistanceTagSwimming, ResultBase, TrackingType
+from schemas.results import DistanceTagRunning, DistanceTagSwimming, ResultBase, TrackingType, Goal
 
 
 def calculate_pace(time: int, distance: float) -> int:
@@ -52,10 +52,9 @@ def get_margin(number: float):
 
 def sort_on_pace(activity: Activity):
     official_index, personal_index = get_official_and_personal_indices(activity)
-
-    if official_index:
+    if official_index is not None:
         return activity.results[official_index].pace
-    elif personal_index:
+    elif personal_index is not None:
         return activity.results[personal_index].pace
 
 
