@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -139,8 +139,7 @@ class Goal(Base):
     __tablename__ = "goals"
 
     id = Column(Integer, primary_key=True, index=True)
-    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
-    distance = Column(Double, index=True)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     time = Column(Integer, index=True)
     pace = Column(Integer, index=True)
     speed = Column(Double, index=True)
@@ -158,9 +157,10 @@ class Event(Base):
     date = Column(String, index=True, nullable=False)
     environment = Column(String, index=True)
     race_type = Column(String, index=True)
+    distance = Column(Double, index=True, nullable=False)
     distance_tag = Column(String, index=True, nullable=True)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    goal = relationship("Goal", back_populates="event", cascade="all, delete-orphan")
+    goal = relationship("Goal", back_populates="event", cascade="all, delete-orphan", uselist=False)
     user = relationship("User", back_populates="events")

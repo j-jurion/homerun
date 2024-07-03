@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 import crud
 from schemas.activities import Activity, ActivityCreate
 from database import get_db
-from schemas.events import EventBase, EventOutput
+from schemas.events import Event, EventCreate
 
 router = APIRouter(
     prefix="/api/events",
@@ -15,22 +15,23 @@ router = APIRouter(
 )
 
 
-@router.get("/{user_id}/{type}", response_model=list[EventBase])
-def get_events(user_id: int, type: str, db: Session = Depends(get_db)) -> List[EventBase]:
+@router.get("/{user_id}/{type}", response_model=list[Event])
+def get_events(user_id: int, type: str, db: Session = Depends(get_db)) -> List[Event]:
     return crud.get_events(db=db, type=type, user_id=user_id)
 
 
-@router.get("/{event_id}", response_model=EventBase)
-def get_activity(event_id: int, db: Session = Depends(get_db)) -> EventBase:
+@router.get("/{event_id}", response_model=Event)
+def get_event(event_id: int, db: Session = Depends(get_db)) -> Event:
     event = crud.get_event(db=db, event_id=event_id)
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
     return event
 
 
-@router.post("/{user_id}", response_model=EventOutput)
+@router.post("/{user_id}", response_model=Event)
 def create_event(
-        user_id: int, event: EventBase, db: Session = Depends(get_db)
+        user_id: int, event: EventCreate, db: Session = Depends(get_db)
 ):
-    return crud.create_event(db=db, event=event, user_id=user_id)
+    event = crud.create_event(db=db, event=event, user_id=user_id)
+    return event
 

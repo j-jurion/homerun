@@ -18,6 +18,7 @@ router = APIRouter(
 def get_activities(user_id: int, type: str, db: Session = Depends(get_db)) -> List[Activity]:
     return crud.get_activities(db=db, type=type, user_id=user_id)
 
+
 @router.get("/{activity_id}", response_model=Activity)
 def get_activity(activity_id: int, db: Session = Depends(get_db)) -> Activity:
     activity = crud.get_activity(db=db, activity_id=activity_id)

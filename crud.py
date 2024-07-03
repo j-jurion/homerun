@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import models
 from definitions import ActivityType, DistanceTagRunning, DistanceTagSwimming
 from schemas.activities import ActivityCreate
-from schemas.events import EventBase
+from schemas.events import EventBase, EventCreate
 from schemas.results import ResultBase, Goal, GoalBase
 from schemas.users import UserCreate, UserUpdate
 from utils.utils import calculate_pace, calculate_speed, get_distance_tag, sort_on_pace, get_activity_distance_tag
@@ -206,37 +206,37 @@ def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
 
 
-def create_goal(db: Session, goal: GoalBase, event_id: int):
-    db_results = models.Goal(
+def create_goal(db: Session, goal: GoalBase, distance: float, event_id: int):
+    db_goal = models.Goal(
         **goal.model_dump(),
         event_id=event_id,
-        pace=calculate_pace(goal.time, goal.distance),
-        speed=calculate_speed(goal.time, goal.distance),
+        pace=calculate_pace(goal.time, distance),
+        speed=calculate_speed(goal.time, distance),
     )
-    db.add(db_results)
+    db.add(db_goal)
     db.commit()
-    db.refresh(db_results)
+    db.refresh(db_goal)
+    print(db_goal)
 
-    return db_results
+    return db_goal
 
 
-def create_event(db: Session, event: EventBase, user_id: int):
-    print(event)
+def create_event(db: Session, event: EventCreate, user_id: int):
     db_event = models.Event(
         name=event.name,
         type=event.type,
         description=event.description,
         date=event.date,
+        distance=event.distance,
         environment=event.environment,
         race_type=event.race_type,
-        distance_tag=get_distance_tag(event.goal.distance, event.type),
+        distance_tag=get_distance_tag(event.distance, event.type),
         user_id=user_id,
-        goal=event.goal
     )
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
-
     if event.goal:
-        create_goal(db, event.goal, db_event.id)
+        create_goal(db, event.goal, event.distance, db_event.id)
+
     return db_event
