@@ -25,11 +25,13 @@ class Activity(Base):
     month_id = Column(Integer, ForeignKey("monthly.id"), nullable=False)
     year_id = Column(Integer, ForeignKey("yearly.id"), nullable=False)
     event_id = Column(Integer, ForeignKey("events.id"))
+    # training_id = Column(Integer, ForeignKey("training.id"))
 
     user = relationship("User", back_populates="activities")
     monthly = relationship("Monthly", back_populates="activities")
     yearly = relationship("Yearly", back_populates="activities")
     event = relationship("Event", back_populates="activity")
+    # training = relationship("Training", back_populates="activities")
 
 
 class User(Base):
@@ -41,6 +43,7 @@ class User(Base):
 
     activities = relationship("Activity", back_populates="user", cascade="all, delete-orphan")
     events = relationship("Event", back_populates="user", cascade="all, delete-orphan")
+    trainings = relationship("Training", back_populates="user", cascade="all, delete-orphan")
     monthly = relationship("Monthly", back_populates="user", cascade="all, delete-orphan")
     yearly = relationship("Yearly", back_populates="user", cascade="all, delete-orphan")
 
@@ -163,7 +166,26 @@ class Event(Base):
     distance_tag = Column(String, index=True, nullable=True)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    training_id = Column(Integer, ForeignKey("training.id"))
 
     goal = relationship("Goal", back_populates="event", cascade="all, delete-orphan", uselist=False)
     user = relationship("User", back_populates="events")
     activity = relationship("Activity", back_populates="event", uselist=False)
+    training = relationship("Training", back_populates="events")
+
+
+class Training(Base):
+    __tablename__ = "training"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    type = Column(String, index=True, nullable=False)
+    description = Column(String, index=True)
+    begin_date = Column(String, index=True, nullable=False)
+    end_date = Column(String, index=True, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    events = relationship("Event", back_populates="training")
+    user = relationship("User", back_populates="trainings")
+    # activities = relationship("Activity", back_populates="training")

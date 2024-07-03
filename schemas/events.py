@@ -18,6 +18,7 @@ class EventBase(BaseModel):
     environment: Terrain | Pool
     race_type: RaceType
     distance: float
+    training_id: int | None = None
 
     model_config = {
         "json_schema_extra": {

@@ -9,6 +9,7 @@ from definitions import ActivityType, DistanceTagRunning, DistanceTagSwimming
 from schemas.activities import ActivityCreate
 from schemas.events import EventBase, EventCreate
 from schemas.results import ResultBase, Goal, GoalBase
+from schemas.training import TrainingBase
 from schemas.users import UserCreate, UserUpdate
 from utils.utils import calculate_pace, calculate_speed, get_distance_tag, sort_on_pace, get_activity_distance_tag
 
@@ -232,6 +233,7 @@ def create_event(db: Session, event: EventCreate, user_id: int):
         race_type=event.race_type,
         distance_tag=get_distance_tag(event.distance, event.type),
         user_id=user_id,
+        training_id=event.training_id,
     )
     db.add(db_event)
     db.commit()
@@ -257,3 +259,44 @@ def edit_event(db: Session, event_id: int, event: EventCreate):
     db_event = db.query(models.Event).filter(models.Event.id == event_id).first()
     remove_event(db, event_id)
     return create_event(db, event, db_event.user_id)
+
+
+def get_trainings(db: Session, type: str, user_id: int):
+    return db.query(models.Training).filter(models.Training.user_id == user_id).filter(
+        models.Training.type == type).all()
+
+
+def get_training(db: Session, training_id: int):
+    return db.query(models.Training).filter(models.Training.id == training_id).first()
+
+
+def create_training(db: Session, training: TrainingBase, user_id: int):
+    db_training = models.Training(
+        name=training.name,
+        type=training.type,
+        description=training.description,
+        begin_date=training.begin_date,
+        end_date=training.end_date,
+        user_id=user_id,
+    )
+    db.add(db_training)
+    db.commit()
+    db.refresh(db_training)
+
+    return db_training
+
+
+def remove_training(db: Session, training_id: int):
+    db_training = db.get(models.Training, training_id)
+    if not db_training:
+        raise HTTPException(status_code=404, detail="Training not found")
+    db.delete(db_training)
+    db.commit()
+
+    return {"ok": True}
+
+
+def edit_training(db: Session, training_id: int, training: TrainingBase):
+    db_training = db.query(models.Training).filter(models.Training.id == training_id).first()
+    remove_training(db, training_id)
+    return create_training(db, training, db_training.user_id)
