@@ -29,9 +29,9 @@ def get_activity(activity_id: int, db: Session = Depends(get_db)) -> Activity:
 
 @router.post("/{user_id}", response_model=Activity)
 def create_activity(
-        user_id: int, activity: ActivityCreate, db: Session = Depends(get_db)
+        user_id: int, activity: ActivityCreate, db: Session = Depends(get_db), event_id: int | None = None
 ):
-    return crud.create_activity(db=db, activity=activity, user_id=user_id)
+    return crud.create_activity(db=db, activity=activity, user_id=user_id, event_id=event_id)
 
 
 @router.put("/{activity_id}")

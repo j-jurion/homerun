@@ -20,29 +20,31 @@ class EventBase(BaseModel):
     distance: float
 
     model_config = {
-           "json_schema_extra": {
-               "examples": [
-                   {
-                       "name": "new event",
-                       "type": "running",
-                       "description": "new PR",
-                       "date": "2024-07-03",
-                       "environment": "road",
-                       "race_type": "base",
-                       "distance": 10,
-                       "goal": {
-                           "time": 1000
-                       }
-                   }
-               ]
-           }
-       }
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "new event",
+                    "type": "running",
+                    "description": "new PR",
+                    "date": "2024-07-03",
+                    "environment": "road",
+                    "race_type": "base",
+                    "distance": 10,
+                    "goal": {
+                        "time": 1000
+                    }
+                }
+            ]
+        }
+    }
 
 
 class Event(EventBase):
+    id: int
     user_id: int
     distance_tag: str
     goal: Goal | None = None
+    activity: Activity | None = None
 
 
 class EventCreate(EventBase):

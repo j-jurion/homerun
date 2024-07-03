@@ -20,33 +20,33 @@ class ActivityBase(BaseModel):
     with_friends: bool
 
     model_config = {
-            "json_schema_extra": {
-                "examples": [
-                    {
-                        "name": "Example run",
-                        "type": "running",
-                        "description": "This is an example",
-                        "date": "2023-11-22",
-                        "environment": "road",
-                        "training_type": "base",
-                        "with_friends": 0,
-                        "results": [
-                            {
-                                "distance": 10,
-                                "time": 3000,
-                                "tracking_type": "personal"
-                            },
-                            {
-                                "distance": 10,
-                                "time": 3000,
-                                "tracking_type": "official",
-                                "url": ""
-                            }
-                        ]
-                    }
-                ]
-            }
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Example run",
+                    "type": "running",
+                    "description": "This is an example",
+                    "date": "2023-11-22",
+                    "environment": "road",
+                    "training_type": "base",
+                    "with_friends": 0,
+                    "results": [
+                        {
+                            "distance": 10,
+                            "time": 3000,
+                            "tracking_type": "personal"
+                        },
+                        {
+                            "distance": 10,
+                            "time": 3000,
+                            "tracking_type": "official",
+                            "url": ""
+                        }
+                    ],
+                }
+            ]
         }
+    }
 
 
 class Activity(ActivityBase):
@@ -56,6 +56,7 @@ class Activity(ActivityBase):
     year_id: int
     results: List[Result]
     distance_tag: str
+    event_id: int | None = None
 
 
 class ActivityCreate(ActivityBase):

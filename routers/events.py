@@ -33,5 +33,16 @@ def create_event(
         user_id: int, event: EventCreate, db: Session = Depends(get_db)
 ):
     event = crud.create_event(db=db, event=event, user_id=user_id)
+    event.activity = None
     return event
 
+
+@router.put("/{event_id}")
+def edit_event(event_id: int, event: EventCreate,
+               db: Session = Depends(get_db)) -> Event:
+    return crud.edit_event(db=db, event_id=event_id, event=event)
+
+
+@router.delete("/{event_id}")
+def remove_event(event_id: int, db: Session = Depends(get_db)):
+    return crud.remove_event(db=db, event_id=event_id)

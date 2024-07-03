@@ -3,7 +3,7 @@ from typing import Union
 from pydantic import BaseModel
 
 from schemas.activities import Activity
-from schemas.events import EventBase
+from schemas.events import EventBase, Event
 
 
 class UserBase(BaseModel):
@@ -28,7 +28,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     activities: list[Activity] = []
-    events: list[EventBase] = []
+    events: list[Event] = []
 
 
 class UserUpdate(UserBase):

@@ -24,10 +24,12 @@ class Activity(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     month_id = Column(Integer, ForeignKey("monthly.id"), nullable=False)
     year_id = Column(Integer, ForeignKey("yearly.id"), nullable=False)
+    event_id = Column(Integer, ForeignKey("events.id"))
 
     user = relationship("User", back_populates="activities")
     monthly = relationship("Monthly", back_populates="activities")
     yearly = relationship("Yearly", back_populates="activities")
+    event = relationship("Event", back_populates="activity")
 
 
 class User(Base):
@@ -164,3 +166,4 @@ class Event(Base):
 
     goal = relationship("Goal", back_populates="event", cascade="all, delete-orphan", uselist=False)
     user = relationship("User", back_populates="events")
+    activity = relationship("Activity", back_populates="event", uselist=False)

@@ -81,7 +81,7 @@ def create_result(db: Session, result: ResultBase, activity_id: int,
     return db_results
 
 
-def create_activity(db: Session, activity: ActivityCreate, user_id: int):
+def create_activity(db: Session, activity: ActivityCreate, user_id: int, event_id: int | None):
     db_activity = models.Activity(
         name=activity.name,
         type=activity.type,
@@ -95,7 +95,7 @@ def create_activity(db: Session, activity: ActivityCreate, user_id: int):
         user_id=user_id,
         month_id=get_month_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
         year_id=get_year_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
-        event_id=activity.event_id,
+        event_id=event_id if event_id else None,
     )
     db.add(db_activity)
     db.commit()
@@ -236,7 +236,24 @@ def create_event(db: Session, event: EventCreate, user_id: int):
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+
     if event.goal:
         create_goal(db, event.goal, event.distance, db_event.id)
 
     return db_event
+
+
+def remove_event(db: Session, event_id: int):
+    db_event = db.get(models.Event, event_id)
+    if not db_event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    db.delete(db_event)
+    db.commit()
+
+    return {"ok": True}
+
+
+def edit_event(db: Session, event_id: int, event: EventCreate):
+    db_event = db.query(models.Event).filter(models.Event.id == event_id).first()
+    remove_event(db, event_id)
+    return create_event(db, event, db_event.user_id)
