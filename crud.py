@@ -82,7 +82,7 @@ def create_result(db: Session, result: ResultBase, activity_id: int,
     return db_results
 
 
-def create_activity(db: Session, activity: ActivityCreate, user_id: int, event_id: int | None):
+def create_activity(db: Session, activity: ActivityCreate, user_id: int, event_id: int | None, training_id: int | None):
     db_activity = models.Activity(
         name=activity.name,
         type=activity.type,
@@ -97,6 +97,7 @@ def create_activity(db: Session, activity: ActivityCreate, user_id: int, event_i
         month_id=get_month_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
         year_id=get_year_id(db=db, date=activity.date, user_id=user_id, activity_type=activity.type.value),
         event_id=event_id if event_id else None,
+        training_id=training_id if training_id else None,
     )
     db.add(db_activity)
     db.commit()

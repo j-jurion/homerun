@@ -21,4 +21,4 @@ class Training(TrainingBase):
     id: int
     user_id: int
     events: List[Event]
-    # activity: List[Activity]
+    activities: List[Activity]

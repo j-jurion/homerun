@@ -57,7 +57,7 @@ class Activity(ActivityBase):
     results: List[Result]
     distance_tag: str
     event_id: int | None = None
-    # training_id: int | None = None
+    training_id: int | None = None
 
 
 class ActivityCreate(ActivityBase):

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from schemas.activities import Activity
 from schemas.events import EventBase, Event
+from schemas.training import Training
 
 
 class UserBase(BaseModel):
@@ -29,6 +30,7 @@ class User(UserBase):
     id: int
     activities: list[Activity] = []
     events: list[Event] = []
+    trainings: list[Training] = []
 
 
 class UserUpdate(UserBase):

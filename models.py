@@ -25,13 +25,13 @@ class Activity(Base):
     month_id = Column(Integer, ForeignKey("monthly.id"), nullable=False)
     year_id = Column(Integer, ForeignKey("yearly.id"), nullable=False)
     event_id = Column(Integer, ForeignKey("events.id"))
-    # training_id = Column(Integer, ForeignKey("training.id"))
+    training_id = Column(Integer, ForeignKey("training.id"))
 
     user = relationship("User", back_populates="activities")
     monthly = relationship("Monthly", back_populates="activities")
     yearly = relationship("Yearly", back_populates="activities")
     event = relationship("Event", back_populates="activity")
-    # training = relationship("Training", back_populates="activities")
+    training = relationship("Training", back_populates="activities")
 
 
 class User(Base):
@@ -188,4 +188,4 @@ class Training(Base):
 
     events = relationship("Event", back_populates="training")
     user = relationship("User", back_populates="trainings")
-    # activities = relationship("Activity", back_populates="training")
+    activities = relationship("Activity", back_populates="training")
