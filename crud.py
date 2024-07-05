@@ -301,3 +301,87 @@ def edit_training(db: Session, training_id: int, training: TrainingBase):
     db_training = db.query(models.Training).filter(models.Training.id == training_id).first()
     remove_training(db, training_id)
     return create_training(db, training, db_training.user_id)
+
+
+def get_untraceables(db, user_id):
+    return db.query(models.Untraceable).filter(models.Untraceable.user_id == user_id).all()
+
+
+def get_untraceable(db, untraceable_id):
+    print(db.query(models.Untraceable))
+    print(db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id))
+    return db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id).first()
+
+
+def create_untraceable(db, untraceable, user_id):
+    dates = [d.strftime("%Y-%m-%d") for d in untraceable.dates]
+    db_untraceable = models.Untraceable(
+        name=untraceable.name,
+        description=untraceable.description,
+        dates=dates,
+        user_id=user_id,
+    )
+    db.add(db_untraceable)
+    db.commit()
+    db.refresh(db_untraceable)
+    return db_untraceable
+
+
+def edit_untraceable(db, untraceable_id, untraceable):
+    db_untraceable = db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id).first()
+    if not db_untraceable:
+        raise HTTPException(status_code=404, detail="Untraceable activity not found")
+    untraceable_data = untraceable.model_dump(exclude_unset=True)
+    for key, value in untraceable_data.items():
+        if key == "dates":
+            setattr(db_untraceable, key, [d.strftime("%Y-%m-%d") for d in value])
+        else:
+            setattr(db_untraceable, key, value)
+    db.add(db_untraceable)
+    db.commit()
+    db.refresh(db_untraceable)
+    return db_untraceable
+
+
+def remove_untraceable(db, untraceable_id):
+    db_untraceable = db.get(models.Untraceable, untraceable_id)
+    if not db_untraceable:
+        raise HTTPException(status_code=404, detail="Untraceable activity not found")
+    db.delete(db_untraceable)
+    db.commit()
+
+    return {"ok": True}
+
+
+def add_date_untraceable(db, untraceable_id, new_date):
+    db_untraceable = db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id).first()
+    if not db_untraceable:
+        raise HTTPException(status_code=404, detail="Untraceable activity not found")
+    setattr(db_untraceable, "dates", db_untraceable.dates + [new_date])
+
+    db.add(db_untraceable)
+    db.commit()
+    db.refresh(db_untraceable)
+    return db_untraceable
+
+
+def remove_date_untraceable(db, untraceable_id, remove_date):
+    db_untraceable = db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id).first()
+    if not db_untraceable:
+        raise HTTPException(status_code=404, detail="Untraceable activity not found")
+
+    if not any(remove_date in d for d in db_untraceable.dates):
+        raise HTTPException(status_code=404, detail="Date to be removed not found")
+
+    dates = db_untraceable.dates
+    dates.remove(remove_date)
+    setattr(db_untraceable, "dates", [])
+
+    db.add(db_untraceable)
+    db.commit()
+
+    setattr(db_untraceable, "dates", dates)
+    db.add(db_untraceable)
+    db.commit()
+    db.refresh(db_untraceable)
+    return db_untraceable

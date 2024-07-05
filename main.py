@@ -4,7 +4,7 @@ from starlette.responses import FileResponse
 
 import models
 from database import engine
-from routers import users, activities, stats, config, events, training
+from routers import users, activities, stats, config, events, training, untraceables
 from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
@@ -31,6 +31,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(activities.router)
+app.include_router(untraceables.router)
 app.include_router(events.router)
 app.include_router(training.router)
 app.include_router(stats.router)

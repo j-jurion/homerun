@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, Boolean, Float
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, Boolean, Float, JSON
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -34,6 +34,18 @@ class Activity(Base):
     training = relationship("Training", back_populates="activities")
 
 
+class Untraceable(Base):
+    __tablename__ = "untraceables"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    description = Column(String, index=True)
+    dates = Column(JSON, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    user = relationship("User", back_populates="untraceables")
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -42,6 +54,7 @@ class User(Base):
     hashed_password = Column(String)
 
     activities = relationship("Activity", back_populates="user", cascade="all, delete-orphan")
+    untraceables = relationship("Untraceable", back_populates="user", cascade="all, delete-orphan")
     events = relationship("Event", back_populates="user", cascade="all, delete-orphan")
     trainings = relationship("Training", back_populates="user", cascade="all, delete-orphan")
     monthly = relationship("Monthly", back_populates="user", cascade="all, delete-orphan")

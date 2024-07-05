@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from schemas.activities import Activity
 from schemas.events import EventBase, Event
 from schemas.training import Training
+from schemas.untraceables import Untraceable
 
 
 class UserBase(BaseModel):
@@ -31,6 +32,7 @@ class User(UserBase):
     activities: list[Activity] = []
     events: list[Event] = []
     trainings: list[Training] = []
+    untraceables: list[Untraceable] = []
 
 
 class UserUpdate(UserBase):
