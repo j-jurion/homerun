@@ -35,7 +35,7 @@ class Untraceable(UntraceableBase):
     dates: List[str]
 
 
-class UntraceableUpdate(Untraceable):
+class UntraceableUpdate(UntraceableBase):
     name:  Union[str, None] = None
     description:  Union[str, None] = None
     dates: Union[List[date], None] = None

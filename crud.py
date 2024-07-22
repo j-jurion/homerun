@@ -1,5 +1,4 @@
-import json
-from typing import Any, Union
+from typing import Union
 from datetime import date
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -7,8 +6,8 @@ from sqlalchemy.orm import Session
 import models
 from definitions import ActivityType, DistanceTagRunning, DistanceTagSwimming
 from schemas.activities import ActivityCreate
-from schemas.events import EventBase, EventCreate
-from schemas.results import ResultBase, Goal, GoalBase
+from schemas.events import EventCreate
+from schemas.results import ResultBase, GoalBase
 from schemas.training import TrainingBase
 from schemas.users import UserCreate, UserUpdate
 from utils.utils import calculate_pace, calculate_speed, get_distance_tag, sort_on_pace, get_activity_distance_tag
@@ -41,7 +40,11 @@ def edit_user(db: Session, user_id: int, user: UserUpdate):
         raise HTTPException(status_code=404, detail="User not found")
     user_data = user.model_dump(exclude_unset=True)
     for key, value in user_data.items():
-        setattr(db_user, key, value)
+        if key == "password":
+            setattr(db_user, "hashed_password", value + "notreallyhashed")
+        else:
+            setattr(db_user, key, value)
+
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -109,10 +112,10 @@ def create_activity(db: Session, activity: ActivityCreate, user_id: int, event_i
     return db_activity
 
 
-def edit_activity(db: Session, activity_id: int, activity: ActivityCreate):
+def edit_activity(db: Session, activity_id: int, activity: ActivityCreate, event_id: int | None, training_id: int | None):
     db_activity = db.query(models.Activity).filter(models.Activity.id == activity_id).first()
     remove_activity(db, activity_id)
-    return create_activity(db, activity, db_activity.user_id)
+    return create_activity(db, activity, db_activity.user_id, event_id=event_id, training_id=training_id)
 
 
 def remove_activity(db: Session, activity_id: int):

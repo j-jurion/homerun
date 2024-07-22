@@ -1,6 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, APIRouter
-from starlette.responses import FileResponse
+from fastapi import FastAPI
 
 import models
 from database import engine

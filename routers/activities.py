@@ -39,9 +39,14 @@ def create_activity(
 
 
 @router.put("/{activity_id}")
-def edit_activity(activity_id: int, activity: ActivityCreate,
-                  db: Session = Depends(get_db)) -> Activity:
-    return crud.edit_activity(db=db, activity_id=activity_id, activity=activity)
+def edit_activity(
+        activity_id: int,
+        activity: ActivityCreate,
+        db: Session = Depends(get_db),
+        event_id: int | None = None,
+        training_id: int | None = None
+) -> Activity:
+    return crud.edit_activity(db=db, activity_id=activity_id, activity=activity, event_id=event_id, training_id=training_id)
 
 
 @router.delete("/{activity_id}")

@@ -37,9 +37,10 @@ def create_untraceable(
     print(untraceable.dates)
     return untraceable
 
+
 @router.patch("/{untraceable_id}", response_model=Untraceable)
 def edit_untraceable(untraceable_id: int, untraceable: UntraceableUpdate,
-                  db: Session = Depends(get_db)) -> Untraceable:
+                     db: Session = Depends(get_db)) -> Untraceable:
     return crud.edit_untraceable(db=db, untraceable_id=untraceable_id, untraceable=untraceable)
 
 
@@ -47,9 +48,11 @@ def edit_untraceable(untraceable_id: int, untraceable: UntraceableUpdate,
 def remove_untraceable(untraceable_id: int, db: Session = Depends(get_db)):
     return crud.remove_untraceable(db=db, untraceable_id=untraceable_id)
 
+
 @router.patch("/{untraceable_id}/new/{date}")
 def add_date_untraceable(untraceable_id: int, new_date: str, db: Session = Depends(get_db)):
     return crud.add_date_untraceable(db=db, untraceable_id=untraceable_id, new_date=new_date)
+
 
 @router.patch("/{untraceable_id}/remove/{date}")
 def remove_date_untraceable(untraceable_id: int, remove_date: str, db: Session = Depends(get_db)):
