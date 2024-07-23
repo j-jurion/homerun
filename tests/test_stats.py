@@ -2,13 +2,13 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Session, SQLModel
 from sqlmodel.pool import StaticPool
 
-from main import app
 from database import Base, get_db
+from main import app
 from models import User
-from tests.utils import get_user_json, create_activity, get_stats_json, get_activity_json
+from tests.utils import get_stats_json, get_activity_json
 
 STATS_URL = "/api/stats"
 ACTIVITY_URL = "/api/activities"

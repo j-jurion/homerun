@@ -2,16 +2,15 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel, select
 from sqlmodel.pool import StaticPool
+from sqlmodel import Session, SQLModel, select
 
-from main import app
 from database import Base, get_db
-from models import User, Activity
-from tests.utils import get_activity_json, create_activity
+from main import app
+from models import User, Event
+from tests.utils import create_activity, create_event, get_event_json
 
-USER_URL = "/api/users"
-ACTIVITY_URL = "/api/activities"
+EVENTS_URL = "/api/events"
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
@@ -46,98 +45,107 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_get_activities(session: Session, client: TestClient):
-    user = User(user_name="user", hashed_password="123456")
-    activity_1 = create_activity("activity 1")
-    activity_2 = create_activity("activity 2")
-    session.add(user)
+def test_get_events(session: Session, client: TestClient):
+    user_1 = User(user_name="user 1", hashed_password="123456")
+    event_1 = create_event("event 1")
+    event_2 = create_event("event 2")
+    activity_1 = create_activity()
+    activity_1.event_id = 1
+    activity_2 = create_activity()
+    activity_2.event_id = 2
+    session.add(user_1)
+    session.add(event_1)
+    session.add(event_2)
     session.add(activity_1)
     session.add(activity_2)
     session.commit()
 
-    response = client.get(ACTIVITY_URL + "/1/running")
+    response = client.get(EVENTS_URL + "/1/running")
     data = response.json()
 
     assert response.status_code == 200
-    assert data[0] == get_activity_json(1, "activity 1")
-    assert data[1] == get_activity_json(2, "activity 2")
+    assert data[0] == get_event_json(1, "event 1")
+    assert data[1] == get_event_json(2, "event 2")
 
 
-def test_get_activity(session: Session, client: TestClient):
+def test_get_event(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
-    activity_1 = create_activity("activity 1")
-    activity_2 = create_activity("activity 2")
+    event_1 = create_event("event 1")
+    event_2 = create_event("event 2")
+    activity_1 = create_activity()
+    activity_1.event_id = 1
     session.add(user)
+    session.add(event_1)
+    session.add(event_2)
     session.add(activity_1)
-    session.add(activity_2)
     session.commit()
 
-    response = client.get(ACTIVITY_URL + "/1")
+    response = client.get(EVENTS_URL + "/1")
     data = response.json()
 
     assert response.status_code == 200
-    assert data == get_activity_json(1, "activity 1")
+    assert data == get_event_json(1, "event 1")
 
 
-def test_create_activity(session: Session, client: TestClient):
+def test_create_event(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
     session.add(user)
     session.commit()
 
     response = client.post(
-        ACTIVITY_URL + "/1",
-        json=get_activity_json(1, "activity 1"),
+        EVENTS_URL + "/1",
+        json=get_event_json(1, "event 1"),
     )
     data = response.json()
     user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
-    assert data == get_activity_json(1, "activity 1")
+    assert data == get_event_json(1, "event 1", with_activity=False)
     assert len(user_data) == 1
-    assert len(user_data[0].activities) == 1
-    assert user_data[0].activities[0].name == "activity 1"
+    assert len(user_data[0].events) == 1
+    assert user_data[0].events[0].name == "event 1"
 
 
-def test_edit_activity(session: Session, client: TestClient):
+def test_edit_event(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
-    activity_1 = create_activity("activity 1")
+    event_1 = create_event("event 1")
     session.add(user)
-    session.add(activity_1)
+    session.add(event_1)
     session.commit()
 
     response = client.put(
-        ACTIVITY_URL + "/1",
-        json=get_activity_json(1, "activity edited")
+        EVENTS_URL + "/1",
+        json=get_event_json(1, "event edited")
     )
     data = response.json()
     user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
-    assert data == get_activity_json(1, "activity edited")
+    assert data == get_event_json(1, "event edited", with_activity=False)
     assert len(user_data) == 1
-    assert len(user_data[0].activities) == 1
-    assert user_data[0].activities[0].name == "activity edited"
+    assert len(user_data[0].events) == 1
+    assert user_data[0].events[0].name == "event edited"
 
 
 def test_remove_activity(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
-    activity_1 = create_activity("activity 1")
-    activity_2 = create_activity("activity 2")
-    activity_3 = create_activity("activity 3")
+    event_1 = create_event("event 1")
+    event_2 = create_event("event 2")
+    event_3 = create_event("event 3")
     session.add(user)
-    session.add(activity_1)
-    session.add(activity_2)
-    session.add(activity_3)
+    session.add(event_1)
+    session.add(event_2)
+    session.add(event_3)
     session.commit()
 
-    response = client.delete(ACTIVITY_URL + "/2")
-    data = session.exec(select(Activity)).all()
+    response = client.delete(EVENTS_URL + "/2")
+    data = session.exec(select(Event)).all()
     user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
-    assert data[0].name == "activity 1"
-    assert data[1].name == "activity 3"
+    assert data[0].name == "event 1"
+    assert data[1].name == "event 3"
     assert len(user_data) == 1
-    assert len(user_data[0].activities) == 2
-    assert user_data[0].activities[0].name == "activity 1"
-    assert user_data[0].activities[1].name == "activity 3"
+    assert len(user_data[0].events) == 2
+    assert user_data[0].events[0].name == "event 1"
+    assert user_data[0].events[1].name == "event 3"
