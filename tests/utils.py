@@ -1,4 +1,4 @@
-from models import Result, Activity, Untraceable, Event
+from models import Result, Activity, Untraceable, Event, Training
 
 
 def create_result(tracking_type="personal"):
@@ -48,6 +48,17 @@ def create_event(name="event 1"):
         race_type="base",
         distance=10.0,
         distance_tag="10k",
+        user_id=1
+    )
+
+
+def create_training(name="training 1"):
+    return Training(
+        name=name,
+        type="running",
+        description="a test event",
+        begin_date="2024-07-23",
+        end_date="2024-07-24",
         user_id=1
     )
 
@@ -128,35 +139,35 @@ def get_activity_json(id=1, name="activity", tracking_type="personal", date="202
 
 def get_event_json(id=1, name="event 1", with_activity=True):
     activity = {
-            'date': '2023-11-22',
-            'description': 'a test',
-            'distance_tag': '10k',
-            'environment': 'road',
-            'event_id': id,
-            'id': id,
-            'month_id': 1,
-            'name': 'activity',
-            'race_type': None,
-            'results': [
-                {
-                    'distance': 10.0,
-                    'distance_tag': '10k',
-                    'pace': 300,
-                    'speed': 12.0,
-                    'time': 3000,
-                    'tracking_type': 'personal',
-                    'url': None,
-                },
-            ],
-            'training_id': None,
-            'training_type': 'base',
-            'type': 'running',
-            'user_id': 1,
-            'with_friends': False,
-            'year_id': 1,
+        'date': '2023-11-22',
+        'description': 'a test',
+        'distance_tag': '10k',
+        'environment': 'road',
+        'event_id': id,
+        'id': id,
+        'month_id': 1,
+        'name': 'activity',
+        'race_type': None,
+        'results': [
+            {
+                'distance': 10.0,
+                'distance_tag': '10k',
+                'pace': 300,
+                'speed': 12.0,
+                'time': 3000,
+                'tracking_type': 'personal',
+                'url': None,
+            },
+        ],
+        'training_id': None,
+        'training_type': 'base',
+        'type': 'running',
+        'user_id': 1,
+        'with_friends': False,
+        'year_id': 1,
 
-        }
-    event =  {
+    }
+    event = {
         'activity': None,
         'date': '2024-07-23',
         'description': 'a test event',
@@ -175,6 +186,53 @@ def get_event_json(id=1, name="event 1", with_activity=True):
         event["activity"] = activity
 
     return event
+
+
+def get_training_json(id=1, name="training 1", with_activity=True):
+    activities = [{
+        'date': '2023-11-22',
+        'description': 'a test',
+        'distance_tag': '10k',
+        'environment': 'road',
+        'event_id': None,
+        'id': id,
+        'month_id': 1,
+        'name': 'activity',
+        'race_type': None,
+        'results': [
+            {
+                'distance': 10.0,
+                'distance_tag': '10k',
+                'pace': 300,
+                'speed': 12.0,
+                'time': 3000,
+                'tracking_type': 'personal',
+                'url': None,
+            },
+        ],
+        'training_id': id,
+        'training_type': 'base',
+        'type': 'running',
+        'user_id': 1,
+        'with_friends': False,
+        'year_id': 1,
+
+    }]
+    training = {
+        'activities': [],
+        'begin_date': '2024-07-23',
+        'end_date': '2024-07-24',
+        'description': 'a test event',
+        'id': id,
+        'name': name,
+        'type': 'running',
+        'user_id': 1,
+        'events': []
+    }
+    if with_activity:
+        training["activities"] = activities
+
+    return training
 
 
 def get_stats_json():
