@@ -49,11 +49,11 @@ def remove_untraceable(untraceable_id: int, db: Session = Depends(get_db)):
     return crud.remove_untraceable(db=db, untraceable_id=untraceable_id)
 
 
-@router.patch("/{untraceable_id}/new/{date}")
+@router.patch("/new/{untraceable_id}/{new_date}")
 def add_date_untraceable(untraceable_id: int, new_date: str, db: Session = Depends(get_db)):
     return crud.add_date_untraceable(db=db, untraceable_id=untraceable_id, new_date=new_date)
 
 
-@router.patch("/{untraceable_id}/remove/{date}")
+@router.patch("/remove/{untraceable_id}/{remove_date}")
 def remove_date_untraceable(untraceable_id: int, remove_date: str, db: Session = Depends(get_db)):
     return crud.remove_date_untraceable(db=db, untraceable_id=untraceable_id, remove_date=remove_date)

@@ -1,4 +1,4 @@
-from models import Result, Activity
+from models import Result, Activity, Untraceable
 
 
 def create_result(tracking_type="personal"):
@@ -27,6 +27,43 @@ def create_activity(name="activity", date="2023-11-22"):
         with_friends=0,
         distance_tag="10k"
     )
+
+
+def create_untraceable(name="untraceable 1"):
+    return Untraceable(
+        user_id=1,
+        name=name,
+        description="test untraceables",
+        dates=["2023-11-22", "2023-11-23"]
+    )
+
+
+def get_untraceables_json(names):
+    return [
+        {
+            'dates': [
+                '2023-11-22',
+                '2023-11-23',
+            ],
+            'description': 'test untraceables',
+            'id': count + 1,
+            'name': name,
+            'user_id': 1,
+        } for count, name in enumerate(names)
+    ]
+
+
+def get_untraceable_json(id=1, name="untraceable 1", dates=None):
+    if dates is None:
+        dates = ['2023-11-22',
+                 '2023-11-23', ]
+    return {
+        'dates': dates,
+        'description': 'test untraceables',
+        'id': id,
+        'name': name,
+        'user_id': 1,
+    }
 
 
 def get_user_json(id=1, user_name="user 1"):
@@ -458,7 +495,7 @@ def get_stats_json():
                         'user_id': 1,
                         'with_friends': False,
                         'year_id': 2,
-            },
+                    },
                 ],
                 'activity_type': 'running',
                 'total_distance': 10.0,
@@ -467,4 +504,3 @@ def get_stats_json():
             }
         ]
     }
-

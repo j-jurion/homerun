@@ -45,7 +45,7 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_read_users(session: Session, client: TestClient):
+def test_get_users(session: Session, client: TestClient):
     user_1 = User(user_name="user 1", hashed_password="123456")
     user_2 = User(user_name="user 2", hashed_password="456789")
     session.add(user_1)
@@ -60,7 +60,7 @@ def test_read_users(session: Session, client: TestClient):
     assert data[1] == get_user_json(2, "user 2")
 
 
-def test_read_user(session: Session, client: TestClient):
+def test_get_user(session: Session, client: TestClient):
     user_1 = User(user_name="user 1", hashed_password="123456")
     user_2 = User(user_name="user 2", hashed_password="456789")
     session.add(user_1)
@@ -94,9 +94,10 @@ def test_edit_user(session: Session, client: TestClient):
 
     response = client.patch(
         USER_URL + "/1",
-        json={"password": "654321",
-              "user_name": "user 3"
-              },
+        json={
+            "password": "654321",
+            "user_name": "user 3"
+        },
     )
     data = response.json()
 

@@ -46,7 +46,7 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_read_stats(session: Session, client: TestClient):
+def test_get_stats(session: Session, client: TestClient):
     user_1 = User(user_name="user 1", hashed_password="123456")
     session.add(user_1)
     session.commit()

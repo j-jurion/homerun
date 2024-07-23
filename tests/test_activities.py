@@ -46,7 +46,7 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_read_activities(session: Session, client: TestClient):
+def test_get_activities(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
     activity_1 = create_activity("activity 1")
     activity_2 = create_activity("activity 2")
@@ -63,7 +63,7 @@ def test_read_activities(session: Session, client: TestClient):
     assert data[1] == get_activity_json(2, "activity 2")
 
 
-def test_read_activity(session: Session, client: TestClient):
+def test_get_activity(session: Session, client: TestClient):
     user = User(user_name="user", hashed_password="123456")
     activity_1 = create_activity("activity 1")
     activity_2 = create_activity("activity 2")
