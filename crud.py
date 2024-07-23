@@ -360,6 +360,9 @@ def add_date_untraceable(db, untraceable_id, new_date):
     db_untraceable = db.query(models.Untraceable).filter(models.Untraceable.id == untraceable_id).first()
     if not db_untraceable:
         raise HTTPException(status_code=404, detail="Untraceable activity not found")
+    if any(new_date in d for d in db_untraceable.dates):
+        raise HTTPException(status_code=400, detail="Date is already assigned to this untraceable")
+
     setattr(db_untraceable, "dates", db_untraceable.dates + [new_date])
 
     db.add(db_untraceable)
@@ -374,7 +377,7 @@ def remove_date_untraceable(db, untraceable_id, remove_date):
         raise HTTPException(status_code=404, detail="Untraceable activity not found")
 
     if not any(remove_date in d for d in db_untraceable.dates):
-        raise HTTPException(status_code=404, detail="Date to be removed not found")
+        raise HTTPException(status_code=400, detail="Date to be removed not found")
 
     dates = db_untraceable.dates
     dates.remove(remove_date)
