@@ -8,6 +8,7 @@ from sqlmodel.pool import StaticPool
 from main import app
 from database import Base, get_db
 from models import User
+from tests.utils import get_user_json
 
 USER_URL = "/api/users"
 SQLALCHEMY_DATABASE_URL = "sqlite://"
@@ -55,22 +56,8 @@ def test_read_users(session: Session, client: TestClient):
     data = response.json()
 
     assert response.status_code == 200
-    assert data[0] == {
-        "id": 1,
-        "user_name": "user 1",
-        "activities": [],
-        "untraceables": [],
-        "events": [],
-        "trainings": [],
-    }
-    assert data[1] == {
-        "id": 2,
-        "user_name": "user 2",
-        "activities": [],
-        "untraceables": [],
-        "events": [],
-        "trainings": [],
-    }
+    assert data[0] == get_user_json(1, "user 1")
+    assert data[1] == get_user_json(2, "user 2")
 
 
 def test_read_user(session: Session, client: TestClient):
@@ -84,14 +71,7 @@ def test_read_user(session: Session, client: TestClient):
     data = response.json()
 
     assert response.status_code == 200
-    assert data == {
-        "id": 1,
-        "user_name": "user 1",
-        "activities": [],
-        "untraceables": [],
-        "events": [],
-        "trainings": [],
-    }
+    assert data == get_user_json(1, "user 1")
 
 
 def test_create_user(client: TestClient):
@@ -104,14 +84,7 @@ def test_create_user(client: TestClient):
     data = response.json()
 
     assert response.status_code == 200
-    assert data == {
-        "id": 1,
-        "user_name": "user a",
-        "activities": [],
-        "untraceables": [],
-        "events": [],
-        "trainings": [],
-    }
+    assert data == get_user_json(1, "user a")
 
 
 def test_edit_user(session: Session, client: TestClient):

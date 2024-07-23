@@ -79,15 +79,22 @@ def test_read_activity(session: Session, client: TestClient):
     assert data == get_activity_json(1, "activity 1")
 
 
-def test_create_activity(client: TestClient):
+def test_create_activity(session: Session, client: TestClient):
+    user = User(user_name="user", hashed_password="123456")
+    session.add(user)
+    session.commit()
     response = client.post(
         ACTIVITY_URL + "/1",
         json=get_activity_json(1, "activity 1"),
     )
     data = response.json()
+    user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
     assert data == get_activity_json(1, "activity 1")
+    assert len(user_data) == 1
+    assert len(user_data[0].activities) == 1
+    assert user_data[0].activities[0].name == "activity 1"
 
 
 def test_edit_activity(session: Session, client: TestClient):
@@ -102,9 +109,13 @@ def test_edit_activity(session: Session, client: TestClient):
         json=get_activity_json(1, "activity edited")
     )
     data = response.json()
+    user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
     assert data == get_activity_json(1, "activity edited")
+    assert len(user_data) == 1
+    assert len(user_data[0].activities) == 1
+    assert user_data[0].activities[0].name == "activity edited"
 
 
 def test_remove_activity(session: Session, client: TestClient):
@@ -120,7 +131,12 @@ def test_remove_activity(session: Session, client: TestClient):
 
     response = client.delete(ACTIVITY_URL + "/2")
     data = session.exec(select(Activity)).all()
+    user_data = session.exec(select(User).filter(User.id == 1)).all()
 
     assert response.status_code == 200
     assert data[0].name == "activity 1"
     assert data[1].name == "activity 3"
+    assert len(user_data) == 1
+    assert len(user_data[0].activities) == 2
+    assert user_data[0].activities[0].name == "activity 1"
+    assert user_data[0].activities[1].name == "activity 3"
