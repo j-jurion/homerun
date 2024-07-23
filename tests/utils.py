@@ -188,7 +188,7 @@ def get_event_json(id=1, name="event 1", with_activity=True):
     return event
 
 
-def get_training_json(id=1, name="training 1", with_activity=True):
+def get_training_json(id=1, name="training 1", with_activity=True, with_events=False):
     activities = [{
         'date': '2023-11-22',
         'description': 'a test',
@@ -218,6 +218,21 @@ def get_training_json(id=1, name="training 1", with_activity=True):
         'year_id': 1,
 
     }]
+    event = {
+        'activity': None,
+        'date': '2024-07-23',
+        'description': 'a test event',
+        'distance': 10.0,
+        'distance_tag': '10k',
+        'environment': 'road',
+        'goal': None,
+        'id': id,
+        'name': "event " + str(id),
+        'race_type': 'base',
+        'training_id': id,
+        'type': 'running',
+        'user_id': 1,
+    }
     training = {
         'activities': [],
         'begin_date': '2024-07-23',
@@ -231,7 +246,8 @@ def get_training_json(id=1, name="training 1", with_activity=True):
     }
     if with_activity:
         training["activities"] = activities
-
+    if with_events:
+        training["events"].append(event)
     return training
 
 

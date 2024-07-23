@@ -8,7 +8,7 @@ from sqlmodel.pool import StaticPool
 from database import Base, get_db
 from main import app
 from models import User, Training
-from tests.utils import create_activity, create_training, get_training_json
+from tests.utils import create_activity, create_training, get_training_json, create_event
 
 TRAINING_URL = "/api/training"
 SQLALCHEMY_DATABASE_URL = "sqlite://"
@@ -45,10 +45,14 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_get_training(session: Session, client: TestClient):
+def test_get_trainings(session: Session, client: TestClient):
     user_1 = User(user_name="user 1", hashed_password="123456")
     training_1 = create_training("training 1")
     training_2 = create_training("training 2")
+    event_1 = create_event("event 1")
+    event_1.training_id = 1
+    event_2 = create_event("event 2")
+    event_2.training_id = 2
     activity_1 = create_activity()
     activity_1.training_id = 1
     activity_2 = create_activity()
@@ -56,6 +60,8 @@ def test_get_training(session: Session, client: TestClient):
     session.add(user_1)
     session.add(training_1)
     session.add(training_2)
+    session.add(event_1)
+    session.add(event_2)
     session.add(activity_1)
     session.add(activity_2)
     session.commit()
@@ -64,8 +70,8 @@ def test_get_training(session: Session, client: TestClient):
     data = response.json()
 
     assert response.status_code == 200
-    assert data[0] == get_training_json(1, "training 1")
-    assert data[1] == get_training_json(2, "training 2")
+    assert data[0] == get_training_json(1, "training 1", with_activity=True, with_events=True)
+    assert data[1] == get_training_json(2, "training 2", with_activity=True, with_events=True)
 
 
 def test_get_training(session: Session, client: TestClient):
